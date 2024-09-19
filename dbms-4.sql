@@ -1,6 +1,5 @@
-
-CREATE DATABASE complex_queries;
-USE complex_queries;
+CREATE DATABASE complex_queries_db;
+USE complex_queries_db;
 
 
 CREATE TABLE Book (
@@ -49,25 +48,25 @@ INSERT INTO Book (book_id, title, author, price, category, stock_quantity) VALUE
 SELECT * FROM Book;
 
 INSERT INTO Customers (customer_id, name, customer_email, contact_info) VALUES
-(101, 'Jon', 'jon@gmail.com', '9458556336'),
-(102, 'Rizwan', 'rizwan@gmail.com', '985462535'),
-(103, 'Mohit', 'mohit@gmail.com', '555-5678'),
-(104, 'Shiva', 'shiva@gmail.com', '555-5678'),
-(105, 'Arshad', 'arshad@gmail.com', '555-5678');
+(1, 'Jon', 'jon@gmail.com', '9458556336'),
+(2, 'Rizwan', 'rizwan@gmail.com', '985462535'),
+(3, 'Mohit', 'mohit@gmail.com', '555-5678'),
+(4, 'Shiva', 'shiva@gmail.com', '555-5678'),
+(5, 'Arshad', 'arshad@gmail.com', '555-5678');
 
 
 INSERT INTO Orders (order_id, customer_id, order_date) VALUES
-(201, 101, '2024-09-01'),
-(202, 102, '2024-09-02'),
-(203, 103, '2024-09-01'),
-(204, 104, '2024-09-01');
+(1, 1, '2024-09-01'),
+(2, 2, '2024-09-02'),
+(3, 3, '2024-09-01'),
+(4, 4, '2024-09-01');
 
 
 INSERT INTO OrderDetails (order_id, book_id, quantity) VALUES
-(201, 1, 2),  
-(202, 2, 5),  
-(203, 3, 3), 
-(204, 4, 5);
+(1, 1, 2),  
+(2, 2, 5),  
+(3, 3, 3), 
+(4, 4, 5);
 
 
 SELECT SUM(od.quantity * b.price) AS total_revenue
@@ -75,12 +74,12 @@ FROM OrderDetails od
 JOIN Book b ON od.book_id = b.book_id;
 
 
-SELECT o.customer_id, c.name
-FROM Orders o
-JOIN OrderDetails od ON o.order_id = od.order_id
-JOIN Customers c ON o.customer_id = c.customer_id
-GROUP BY o.order_id, o.customer_id, c.name
-HAVING COUNT(DISTINCT od.book_id) > 1;
+select c.customer_id, c.name
+from customers c
+join orders o on c.customer_id = o.customer_id
+join orderdetails od on o.order_id = od.order_id
+group by c.customer_id , c.name, o.order_id
+having sum(od.quantity)>1;
 
 SELECT c.customer_id, c.name, SUM(od.quantity * b.price) AS total_spent
 FROM Orders o
@@ -96,8 +95,9 @@ SELECT COUNT(DISTINCT customer_id) AS distinct_customers
 FROM Orders;
 
 
-SELECT DISTINCT o.order_id, o.order_date
+SELECT DISTINCT o.order_id, o.order_date,c.customer_id,c.name
 FROM Orders o
 JOIN OrderDetails od ON o.order_id = od.order_id
 JOIN Book b ON od.book_id = b.book_id
+JOIN Customers c ON o.customer_id = c.customer_id
 WHERE b.category = 'SciFi';
